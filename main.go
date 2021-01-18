@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	flag "github.com/spf13/pflag"
 	"gopkg.in/djherbis/times.v1"
 )
 
@@ -26,7 +27,7 @@ func check(e error) {
 	}
 }
 
-// Frontmatter struct holds all Hugo-related frontmatter fileds
+// Frontmatter struct to hold all Hugo-related frontmatter fileds
 type Frontmatter struct {
 	title   string
 	author  string
@@ -60,11 +61,16 @@ func getFrontMatter(path string, author string, draft bool) string {
 }
 
 func main() {
-	author := "Ahmad Obay"
-	draft := true
-	root := "/Users/ahmad.obay/Dropbox (Personal)/Git/GitHub/obay (Selective Sync Conflict)/obay.cloud/content/kbx"
+	var author *string = flag.String("author", "", "Set the post(s) author name.")
+	var draft *bool = flag.Bool("draft", true, "Set the post(s) draft status to true or false.")
+	var rootfolder *string = flag.String("rootfolder", "", "Root folder holding markdown files")
+	flag.Parse()
+	if *rootfolder == "" || *author == "" {
+		flag.Usage()
+		return
+	}
 
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(*rootfolder, func(path string, info os.FileInfo, err error) error {
 		check(err)
 		if info.IsDir() {
 			return nil
@@ -83,7 +89,7 @@ func main() {
 			return nil
 		}
 
-		newContent := getFrontMatter(path, author, draft) + "\n" + content
+		newContent := getFrontMatter(path, *author, *draft) + "\n" + content
 
 		err = ioutil.WriteFile(path, []byte(newContent), 0644)
 		check(err)

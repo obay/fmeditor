@@ -7,4 +7,4 @@ export SENTRY_ENVIRONMENT="Dev"
 export SENTRY_RELEASE="fmeditor"
 
 go build
-./fmeditor
+./fmeditor --author "Ahmad Obay" --draft true --rootfolder "testfolder/"
